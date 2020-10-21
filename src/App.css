@@ -1,38 +1,79 @@
-.App {
+header, 
+h1 {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  color: #ffffff;
+  font-size: 75px;
 }
 
-.App-link {
-  color: #61dafb;
+h2 {
+  text-align: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 50px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body {
+  background-color: #36393f;
+  padding: 25px;
+  font-family: sans-serif;
+}
+
+.wrapper {
+  column-count: 3;
+  column-rule-width: 100px;
+  column-fill: balance;
+}
+
+.list-item:hover {
+  cursor: pointer;
+}
+
+.list, .list-checked {
+  line-height: 1.3;
+  max-width: 100%;
+  max-height: 100%;
+  column-count: 1;
+  column-span: 1;
+  background: #2f3136;
+  justify-content: center;
+  color: #ffffff;
+  word-wrap: normal;
+  overflow: auto;
+  break-inside: avoid;
+  text-decoration: none;
+  user-select: none;
+  font-size: 42px;
+  text-align: center;
+  transition: color 0.75s;
+}
+
+.list:hover {  
+  cursor: pointer;
+  color: #1f2125;
+  background-color: #6d7483;
+}
+
+.item-with-button, .item-with-button-finished {
+  height: 40px;
+  width: 40px;
+  margin: 5px;
+  background-color: #B9BBBE;
+  border-radius: 8px;
+  border: none;
+}
+
+.item-with-button:hover {
+  cursor: pointer;
+}
+
+.list-checked {
+  text-decoration: line-through;
+  color: #454a53;
+  cursor: pointer;
+}
+
+
+li {
+  list-style-type: none;
 }
