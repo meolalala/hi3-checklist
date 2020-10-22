@@ -25,57 +25,38 @@ function List(props) {
 }
 
 function ListItemWithButton(props) {
-    const [count, setCount] = useState(0)
+    const count = props.count
     const item = props.item
     const maxCount = props.maxCount
     const classNameItem = count === maxCount ? "list-checked" : "list"
     const classNameButton = count === maxCount ? "item-with-button-finished" : "item-with-button"
 
-    const handleClickDecrement = () => {
-        if (count > 0) {
-            setCount(count - 1)
-        } else {
-            return
-        }
-    }
+    return (
+        <div className={classNameItem}>
+            {item}<button className={classNameButton} onClick={props.onClickDecrement} >-</button>
+            {count}
+            <button className={classNameButton} onClick={props.onClickIncrement}>+</button>
+        </div>
+    )
 
-    const handleClickIncrement = () => {
-        if (count < maxCount) {
-            setCount(count + 1)
-            console.log(maxCount)
-        } else {
-            return
-        }
-    }
-
-    const handleClickReset = () => {
-        setCount(0)
-    }
-
-    if (count === maxCount) {
-        return (
-            <div className={classNameItem}>
-                {item}<button className="reset-button" style={{ width: '80px' }} onClick={handleClickReset}>reset! </button>
-            </div>
-        )
-    } else {
-        return (
-            <div className={classNameItem}>
-                {item}<button className={classNameButton} onClick={handleClickDecrement}>-</button>
-                {count}
-                <button className={classNameButton} onClick={handleClickIncrement}>+</button>
-            </div>
-        )
-    }
 }
 
-
+const Counters = {
+    COUNTER1: 'counter1',
+    COUNTER2: 'counter2',
+    COUNTER3: 'counter3'
+}
 
 export default class App extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             checked: new Set(),
+            counters: {
+                [Counters.COUNTER1]: 0,
+                [Counters.COUNTER2]: 0,
+                [Counters.COUNTER3]: 0
+            }
         }
     }
 
@@ -91,14 +72,52 @@ export default class App extends React.Component {
         })
     }
 
-    resetList = () => {
+    handleClickIncrement = (counter, maxCount) => {
+        this.setState(state => {
+            if (state.counters[counter] < maxCount) {
+                return {
+                    counters: {
+                        ...state.counters,
+                        [counter]: state.counters[counter] + 1
+                    }
+                }
+            } else {
+                return
+            }
+        })
+    }
+
+    handleClickDecrement = (counter) => {
+        this.setState(state => {
+            if (state.counters[counter] > 0) {
+                return {
+                    counters: {
+                        ...state.counters,
+                        [counter]: state.counters[counter] - 1
+                    }
+                }
+            } else {
+                return
+            }
+        })
+    }
+
+    resetAll = () => {
         const checked = new Set()
         this.setState({
-            checked
+            checked,
+            counters: {
+                [Counters.COUNTER1]: 0,
+                [Counters.COUNTER2]: 0,
+                [Counters.COUNTER3]: 0
+            }
         })
     }
 
     render() {
+        const counter1 = 'counter1'
+        const counter2 = 'counter2'
+        const counter3 = 'counter3'
         return (
             <>
                 <div className="header">
@@ -112,9 +131,10 @@ export default class App extends React.Component {
                         <List listTitle="weeklies" listItems={TASKS.weekly} onClick={this.onClickHandler} checked={this.state.checked} />
                     </div>
                     <div style={{ border: '1px solid black', margin: '5px' }}>
-                        <ListItemWithButton item={TASKS.adventure[0]} maxCount={5} />
-                        <ListItemWithButton item={TASKS.adventure[1]} maxCount={5} />
-                        <ListItemWithButton item={TASKS.adventure[2]} maxCount={10} />
+                        <h2>limited</h2>
+                        <ListItemWithButton item={TASKS.adventure[0]} maxCount={5} onClickIncrement={() => this.handleClickIncrement(counter1, 5)} onClickDecrement={() => this.handleClickDecrement(counter1)} count={this.state.counters[counter1]} />
+                        <ListItemWithButton item={TASKS.adventure[1]} maxCount={5} onClickIncrement={() => this.handleClickIncrement(counter2, 5)} onClickDecrement={() => this.handleClickDecrement(counter2)} count={this.state.counters[counter2]} />
+                        <ListItemWithButton item={TASKS.adventure[2]} maxCount={10} onClickIncrement={() => this.handleClickIncrement(counter3, 5)} onClickDecrement={() => this.handleClickDecrement(counter3)} count={this.state.counters[counter3]} />
                     </div>
                     <div className="reminder-list" style={{ border: '1px solid black', margin: '5px', fontSize: '36px' }}>
                         <h2>reminders</h2>
@@ -124,7 +144,7 @@ export default class App extends React.Component {
                         stigmatas over weapons (mostly) <br />
                         <br />
                         <br />
-                        <button className="reset-button" style={{ width: '80px' }} onClick={this.resetList}>reset list!</button>
+                        <button className="reset-button" style={{ width: '80px' }} onClick={this.resetAll}>reset everything!</button>
                         <br />
                         <br />
                         have fun <img src={mewmelt} alt="cute cat btw" />
