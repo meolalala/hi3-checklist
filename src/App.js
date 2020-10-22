@@ -26,6 +26,12 @@ function List(props) {
 function ListItemWithButton(props) {
     const [count, setCount] = useState(0)
     const item = props.item
+    const resetVisibility = {
+        visibility: count === 5 ? "visible" : "hidden"
+    }
+    const handleClickReset = () => {
+        setCount(0)
+    }
     const classNameItem = () => {
         if (count === 5) {
             return 'list-checked'
@@ -40,7 +46,7 @@ function ListItemWithButton(props) {
             return "item-with-button"
         }
     }
-    const handleClick = () => {
+    const handleClickCounter = () => {
         if (count < 5) {
             setCount(count + 1)
         } else {
@@ -49,7 +55,7 @@ function ListItemWithButton(props) {
     }
     return (
         <div className={classNameItem()}>
-            {item}<button className={classNameButton()} onClick={handleClick}>{count}</button>
+            {item}<button className={classNameButton()} onClick={handleClickCounter}>{count}</button><button className="reset-button" style={resetVisibility} onClick={handleClickReset}>reset</button>
         </div>
     )
 }

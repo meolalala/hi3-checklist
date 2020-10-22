@@ -54,7 +54,7 @@ body {
   background-color: #6d7483;
 }
 
-.item-with-button, .item-with-button-finished {
+.item-with-button, .item-with-button-finished, .reset-button {
   height: 40px;
   width: 40px;
   margin: 5px;
@@ -63,7 +63,7 @@ body {
   border: none;
 }
 
-.item-with-button:hover {
+.item-with-button:hover, .reset-button:hover {
   cursor: pointer;
 }
 
