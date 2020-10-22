@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import './App.css';
+import mewmelt from './mewmelt.png'
 
 const TASKS = {
-    weekly: ['raid 1', 'raid 2', 'quiz', 'quiz trial stage', 'memorial arena', 'bounties', ''],
+    weekly: ['raid 1', 'raid 2', 'quiz', 'quiz trial stage', 'bounties', 'sim battle'],
     daily: ['150 duty', 'material stages', 'training stages', 'event stages', 'story stages', 'campaign', 'commissions', 'coin collection', 'dorm errands', 'mei\'s lunch', 'mei\'s dinner'],
-    adventure: ['tasks accepted', 'tasks completed']
+    adventure: ['tasks accepted', 'tasks completed', 'memorial arena clears']
 }
 
 function List(props) {
@@ -18,7 +19,7 @@ function List(props) {
     })
     return (
         <li style={{ overflow: 'auto', breakInside: 'avoid', border: '1px solid black' }}>
-            {listItems}
+            <h2>{props.listTitle}</h2>{listItems}
         </li>
     )
 }
@@ -26,39 +27,49 @@ function List(props) {
 function ListItemWithButton(props) {
     const [count, setCount] = useState(0)
     const item = props.item
-    const resetVisibility = {
-        visibility: count === 5 ? "visible" : "hidden"
-    }
-    const handleClickReset = () => {
-        setCount(0)
-    }
-    const classNameItem = () => {
-        if (count === 5) {
-            return 'list-checked'
-        } else {
-            return 'list'
-        }
-    }
-    const classNameButton = () => {
-        if (count === 5) {
-            return "item-with-button-finished"
-        } else {
-            return "item-with-button"
-        }
-    }
-    const handleClickCounter = () => {
-        if (count < 5) {
-            setCount(count + 1)
+    const maxCount = props.maxCount
+    const classNameItem = count === maxCount ? "list-checked" : "list"
+    const classNameButton = count === maxCount ? "item-with-button-finished" : "item-with-button"
+
+    const handleClickDecrement = () => {
+        if (count > 0) {
+            setCount(count - 1)
         } else {
             return
         }
     }
-    return (
-        <div className={classNameItem()}>
-            {item}<button className={classNameButton()} onClick={handleClickCounter}>{count}</button><button className="reset-button" style={resetVisibility} onClick={handleClickReset}>reset</button>
-        </div>
-    )
+
+    const handleClickIncrement = () => {
+        if (count < maxCount) {
+            setCount(count + 1)
+            console.log(maxCount)
+        } else {
+            return
+        }
+    }
+
+    const handleClickReset = () => {
+        setCount(0)
+    }
+
+    if (count === maxCount) {
+        return (
+            <div className={classNameItem}>
+                {item}<button className="reset-button" style={{ width: '80px' }} onClick={handleClickReset}>reset! </button>
+            </div>
+        )
+    } else {
+        return (
+            <div className={classNameItem}>
+                {item}<button className={classNameButton} onClick={handleClickDecrement}>-</button>
+                {count}
+                <button className={classNameButton} onClick={handleClickIncrement}>+</button>
+            </div>
+        )
+    }
 }
+
+
 
 export default class App extends React.Component {
     constructor(props) {
@@ -67,8 +78,6 @@ export default class App extends React.Component {
             checked: new Set(),
         }
     }
-
-
 
     onClickHandler = (item) => {
         const checked = new Set(this.state.checked)
@@ -82,6 +91,13 @@ export default class App extends React.Component {
         })
     }
 
+    resetList = () => {
+        const checked = new Set()
+        this.setState({
+            checked
+        })
+    }
+
     render() {
         return (
             <>
@@ -89,15 +105,31 @@ export default class App extends React.Component {
                     <h1>u better do these</h1>
                 </div>
                 <div className="wrapper">
-                    <div >
-                        <List listItems={TASKS.daily} onClick={this.onClickHandler} checked={this.state.checked} />
+                    <div>
+                        <List listTitle="dailies" listItems={TASKS.daily} onClick={this.onClickHandler} checked={this.state.checked} />
                     </div>
                     <div style={{ margin: '5px' }}>
-                        <List listItems={TASKS.weekly} onClick={this.onClickHandler} checked={this.state.checked} />
+                        <List listTitle="weeklies" listItems={TASKS.weekly} onClick={this.onClickHandler} checked={this.state.checked} />
                     </div>
                     <div style={{ border: '1px solid black', margin: '5px' }}>
-                        <ListItemWithButton item={TASKS.adventure[0]} />
-                        <ListItemWithButton item={TASKS.adventure[1]} />
+                        <ListItemWithButton item={TASKS.adventure[0]} maxCount={5} />
+                        <ListItemWithButton item={TASKS.adventure[1]} maxCount={5} />
+                        <ListItemWithButton item={TASKS.adventure[2]} maxCount={10} />
+                    </div>
+                    <div className="reminder-list" style={{ border: '1px solid black', margin: '5px', fontSize: '36px' }}>
+                        <h2>reminders</h2>
+                        dirac sea/q-singularis: every 2 days <br />
+                        adventures reset mon, thurs, sat <br />
+                        always do events!!! <br />
+                        stigmatas over weapons (mostly) <br />
+                        <br />
+                        <br />
+                        <button className="reset-button" style={{ width: '80px' }} onClick={this.resetList}>reset list!</button>
+                        <br />
+                        <br />
+                        have fun <img src={mewmelt} alt="cute cat btw" />
+                        <br />
+                        -meofox
                     </div>
                 </div>
             </>
