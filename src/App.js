@@ -10,35 +10,30 @@ const TASKS = {
 
 function List(props) {
     const listItems = props.listItems.map((item) => {
-        const className = props.checked.has(item) ? "list-checked" : "list"
+        const className = props.checked.has(item) ? "list-item-checked" : "list-item"
         return (
-            <div className={className} key={item.toString()} onClick={() => props.onClick(item)}>
+            <li className={className} key={item.toString()} onClick={() => props.onClick(item)}>
                 {item}
-            </div>
+            </li>
         )
     })
     return (
-        <li style={{ overflow: 'auto', breakInside: 'avoid', border: '1px solid black' }}>
+        <ul style={{ overflow: 'auto', breakInside: 'avoid', border: '1px solid black' }}>
             <h2>{props.listTitle}</h2>{listItems}
-        </li>
+        </ul>
     )
 }
 
-function ListItemWithButton(props) {
-    const count = props.count
-    const item = props.item
-    const maxCount = props.maxCount
-    const classNameItem = count === maxCount ? "list-checked" : "list"
-    const classNameButton = count === maxCount ? "item-with-button-finished" : "item-with-button"
-
+function ListItemWithButton({ count, item, maxCount, onClickDecrement, onClickIncrement }) {
+    const classNameItem = count === maxCount ? "list-item-checked" : "list-item"
     return (
         <div className={classNameItem}>
-            {item}<button className={classNameButton} onClick={props.onClickDecrement} >-</button>
+            {item}
+            <button className={'item-with-button'} onClick={onClickDecrement} >-</button>
             {count}
-            <button className={classNameButton} onClick={props.onClickIncrement}>+</button>
+            <button className={'item-with-button'} onClick={onClickIncrement}>+</button>
         </div>
     )
-
 }
 
 const Counters = {
@@ -47,16 +42,33 @@ const Counters = {
     COUNTER3: 'counter3'
 }
 
+function checkedState() {
+    try {
+        return new Set(JSON.parse(localStorage.getItem('checkedStorage')))
+    } catch {
+        return new Set()
+    }
+}
+
+function counterState() {
+    try {
+        if (JSON.parse(localStorage.getItem('counterStorage')) === null) throw "nothing in storage"
+        return (JSON.parse(localStorage.getItem('counterStorage')))
+    } catch {
+        return {
+            [Counters.COUNTER1]: 0,
+            [Counters.COUNTER2]: 0,
+            [Counters.COUNTER3]: 0,
+        }
+    }
+}
+
 export default class App extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            checked: new Set(),
-            counters: {
-                [Counters.COUNTER1]: 0,
-                [Counters.COUNTER2]: 0,
-                [Counters.COUNTER3]: 0
-            }
+            checked: checkedState(),
+            counters: counterState()
         }
     }
 
@@ -67,22 +79,25 @@ export default class App extends React.Component {
         } else {
             checked.add(item)
         }
-        this.setState({
-            checked
+        this.setState(() => {
+            localStorage.setItem('checkedStorage', JSON.stringify(Array.from(checked)))
+            return {
+                checked
+            }
         })
     }
 
     handleClickIncrement = (counter, maxCount) => {
         this.setState(state => {
             if (state.counters[counter] < maxCount) {
-                return {
-                    counters: {
-                        ...state.counters,
-                        [counter]: state.counters[counter] + 1
-                    }
+                const counters = {
+                    ...state.counters,
+                    [counter]: state.counters[counter] + 1
                 }
-            } else {
-                return
+                localStorage.setItem('counterStorage', JSON.stringify(counters))
+                return {
+                    counters: counters
+                }
             }
         })
     }
@@ -96,9 +111,8 @@ export default class App extends React.Component {
                         [counter]: state.counters[counter] - 1
                     }
                 }
-            } else {
-                return
             }
+            localStorage.setItem('counterStorage', JSON.stringify({ ...state.counters }))
         })
     }
 
@@ -111,6 +125,7 @@ export default class App extends React.Component {
             checked
         })
     }
+
 
     resetAll = () => {
         const checked = new Set()
