@@ -42,33 +42,58 @@ const Counters = {
     COUNTER3: 'counter3'
 }
 
-function checkedState() {
+function getCheckedState() {
+    let values
     try {
-        return new Set(JSON.parse(localStorage.getItem('checkedStorage')))
+        values = JSON.parse(localStorage.getItem('checkedStorage'))
     } catch {
-        return new Set()
+    }
+    return new Set(values)
+}
+
+function getCounterState() {
+    let storageItem
+    try {
+        storageItem = JSON.parse(localStorage.getItem('counterStorage'))
+    } catch {
+    }
+    return {
+        [Counters.COUNTER1]: 0,
+        [Counters.COUNTER2]: 0,
+        [Counters.COUNTER3]: 0,
+        ...storageItem,
     }
 }
 
-function counterState() {
-    try {
-        if (JSON.parse(localStorage.getItem('counterStorage')) === null) throw "nothing in storage"
-        return (JSON.parse(localStorage.getItem('counterStorage')))
-    } catch {
-        return {
-            [Counters.COUNTER1]: 0,
-            [Counters.COUNTER2]: 0,
-            [Counters.COUNTER3]: 0,
-        }
-    }
-}
+// function getInitialState() {
+//     let storageData;
+//     try {
+//         storageData = JSON.parse(localStorage.getItem('data'));
+//     } catch (err) {
+//         console.warn('failed to rebuild state from storage');
+//         console.warn(err);
+//     }
+
+//     const defaultCounters = {};
+//     for (const counter of Object.values(Counters)) {
+//         defaultCounters[counter] = 0;
+//     }
+
+//     return {
+//         checked: new Set(storageData?.checked),
+//         counters: {
+//             ...defaultCounters,
+//             ...storageData?.counters,
+//         },
+//     };
+// }
 
 export default class App extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            checked: checkedState(),
-            counters: counterState()
+            checked: getCheckedState(),
+            counters: getCounterState()
         }
     }
 
@@ -137,6 +162,8 @@ export default class App extends React.Component {
                 [Counters.COUNTER3]: 0
             }
         })
+        localStorage.removeItem('checkedStorage')
+        localStorage.removeItem('counterStorage')
     }
 
     render() {
