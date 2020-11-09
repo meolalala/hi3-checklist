@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import mewmelt from './mewmelt.png'
+import { DateTime } from 'luxon'
 
 const TASKS = {
     weekly: ['raid 1', 'raid 2', 'quiz', 'quiz trial stage', 'bounties', 'sim battle'],
@@ -65,6 +66,24 @@ function getCounterState() {
     }
 }
 
+function getLastUpdate() {
+    let lastUpdateData
+    try {
+        lastUpdateData = JSON.parse(localStorage.getItem('lastUpdateStorage'))
+    } catch (err) {
+        console.warn('failed to rebuild state from storage')
+        console.warn(err)
+    }
+    if (lastUpdateData === null) {
+        console.log('null rip u')
+        return DateTime.utc()
+    } else {
+        return DateTime.fromISO(lastUpdateData)
+    }
+}
+
+
+
 // function getInitialState() {
 //     let storageData;
 //     try {
@@ -93,8 +112,31 @@ export default class App extends React.Component {
         super(props)
         this.state = {
             checked: getCheckedState(),
-            counters: getCounterState()
+            counters: getCounterState(),
+            lastUpdate: getLastUpdate(),
         }
+    }
+
+    componentDidMount() {
+        let resetTime = DateTime.utc().set({ hour: 9 })
+        let currentDay = DateTime.utc()
+        if (currentDay.hour > resetTime.hour && this.state.lastUpdate.day < resetTime.day) {
+            const checked = new Set(this.state.checked)
+            for (const item of TASKS.daily) {
+                checked.delete(item)
+            }
+            this.setState({
+                checked,
+                lastUpdate: DateTime.utc()
+            })
+            requestAnimationFrame(() => alert('dailies reset!'))
+        }
+    }
+
+    componentDidUpdate() {
+        localStorage.setItem('checkedStorage', JSON.stringify(Array.from(this.state.checked)))
+        localStorage.setItem('lastUpdateStorage', JSON.stringify(DateTime.utc()))
+        localStorage.setItem('counterStorage', JSON.stringify(this.state.counters))
     }
 
     onClickHandler = (item) => {
@@ -105,7 +147,6 @@ export default class App extends React.Component {
             checked.add(item)
         }
         this.setState(() => {
-            localStorage.setItem('checkedStorage', JSON.stringify(Array.from(checked)))
             return {
                 checked
             }
@@ -119,7 +160,6 @@ export default class App extends React.Component {
                     ...state.counters,
                     [counter]: state.counters[counter] + 1
                 }
-                localStorage.setItem('counterStorage', JSON.stringify(counters))
                 return {
                     counters: counters
                 }
@@ -137,7 +177,6 @@ export default class App extends React.Component {
                     }
                 }
             }
-            localStorage.setItem('counterStorage', JSON.stringify({ ...state.counters }))
         })
     }
 
@@ -162,8 +201,6 @@ export default class App extends React.Component {
                 [Counters.COUNTER3]: 0
             }
         })
-        localStorage.removeItem('checkedStorage')
-        localStorage.removeItem('counterStorage')
     }
 
     render() {
