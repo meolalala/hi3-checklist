@@ -120,7 +120,7 @@ export default class App extends React.Component {
     componentDidMount() {
         let resetTime = DateTime.utc().set({ hour: 9 })
         let currentDay = DateTime.utc()
-        if (currentDay.hour > resetTime.hour && this.state.lastUpdate.day < resetTime.day) {
+        if (currentDay.hour > resetTime.hour && this.state.lastUpdate.day <= resetTime.day) {
             const checked = new Set(this.state.checked)
             for (const item of TASKS.daily) {
                 checked.delete(item)
